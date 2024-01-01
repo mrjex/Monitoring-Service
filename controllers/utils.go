@@ -18,6 +18,7 @@ func Menu(){
         fmt.Println("--------------------------")
 
         fmt.Println("Enter choice:")
+        //Registers choice and executes coresponding code
         scanner.Scan()
         input := scanner.Text()
         switch input{
@@ -31,8 +32,15 @@ func Menu(){
 
 }
 
+// Displays live updates for service avalability
 func DisplayAvailability(){
 
+    moveUp := "\033[A"
+    moveDown := "\033[B"
+    lineClear := "\033[K"
+    colorGreen := "\x1b[32m"
+    colorRed := "\x1b[31m"
+    resetTextStyle := "\x1b[0m"
 
     fmt.Println("")
     fmt.Println("Press ENTER to exit")
@@ -44,20 +52,22 @@ func DisplayAvailability(){
         case flag := <- UserFlag:
 
             //Move one line up
-            fmt.Print("\033[A")
-            fmt.Print("\033[A")
+            fmt.Print(moveUp)
+            fmt.Print(moveUp)
             //Clear line
-            fmt.Print("\033[K")
+            fmt.Print(lineClear)
 
             if flag {
-                fmt.Print("\x1b[32mUser service\x1b[0m")
+                // Makes text green
+                fmt.Print(colorGreen + "User service" + resetTextStyle)
             } else{
-                fmt.Print("\x1b[31mUser service\x1b[0m")
+                //Makes text red
+                fmt.Print(colorRed + "User service" + resetTextStyle)
             }
 
             //Move one line down
-            fmt.Print("\033[B")
-            fmt.Print("\033[B")
+            fmt.Print(moveDown)
+            fmt.Print(moveDown)
 
             fmt.Print("\r")
         case <- exitChan:
