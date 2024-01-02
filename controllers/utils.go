@@ -46,10 +46,34 @@ func DisplayAvailability(){
     fmt.Println("Press ENTER to exit")
     fmt.Println("--------------------")
     fmt.Println("Clinic service ...")
+    fmt.Println("Notification service ...")
     fmt.Println("User service ...")
     fmt.Println("Appointment service ...")
     for{
         select{
+        case flag := <- NotificationFlag:
+
+            //Move one line up
+            fmt.Print(moveUp)
+            fmt.Print(moveUp)
+            fmt.Print(moveUp)
+            //Clear line
+            fmt.Print(lineClear)
+
+            if flag {
+                // Makes text green
+                fmt.Print(colorGreen + "Notification service" + resetTextStyle)
+            } else{
+                //Makes text red
+                fmt.Print(colorRed + "Notification service" + resetTextStyle)
+            }
+
+            //Move one line down
+            fmt.Print(moveDown)
+            fmt.Print(moveDown)
+            fmt.Print(moveDown)
+
+            fmt.Print("\r")
         case flag := <- UserFlag:
 
             //Move one line up
