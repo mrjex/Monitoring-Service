@@ -13,7 +13,7 @@ import (
 )
 
 func InitialiseLogger(client mqtt.Client) {
-    tokenLog := client.Subscribe("grp20/req/#", byte(0), func(c mqtt.Client, m mqtt.Message){
+    tokenLog := client.Subscribe("grp20/#", byte(0), func(c mqtt.Client, m mqtt.Message){
         go Log(m)
     })
     if tokenLog.Error() != nil {
