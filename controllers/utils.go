@@ -31,6 +31,7 @@ func Menu() {
 			go exitListener()
 			DisplayAvailability()
 		case "2":
+			go exitListener()
 			DisplayReqRes()
 		default:
 			return
@@ -104,13 +105,10 @@ func DisplayAvailability() {
 }
 
 func DisplayReqRes() {
-	/*moveUp := "\033[A"
-	moveDown := "\033[B"
-	lineClear := "\033[K"
+	
 	colorGreen := "\x1b[32m"
-	colorRed := "\x1b[31m"
 	resetTextStyle := "\x1b[0m"
-	*/
+
 
 	percentage, err := monitoring.CalculatePercentage()
 	if err != nil {
@@ -122,7 +120,7 @@ func DisplayReqRes() {
 	fmt.Println("Press ENTER to exit")
 	fmt.Println("--------------------")
 	
-	fmt.Println(fmt.Sprintf("Request to response ratio: %.2f%%", percentage))
+	fmt.Println(fmt.Sprintf( colorGreen + "Request to response ratio: %.2f%%" + resetTextStyle, percentage))
 }
 
 func exitListener() {
