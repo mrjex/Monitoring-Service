@@ -51,6 +51,32 @@ func DisplayAvailability(){
     fmt.Println("Appointment service ...")
     for{
         select{
+        case flag := <- ClinicFlag:
+
+            //Move one line up
+            fmt.Print(moveUp)
+            fmt.Print(moveUp)
+            fmt.Print(moveUp)
+            fmt.Print(moveUp)
+            //Clear line
+            fmt.Print(lineClear)
+
+            if flag {
+                // Makes text green
+                fmt.Print(colorGreen + "Clinic service" + resetTextStyle)
+            } else{
+                //Makes text red
+                fmt.Print(colorRed + "Clinic service" + resetTextStyle)
+            }
+
+            //Move one line down
+            fmt.Print(moveDown)
+            fmt.Print(moveDown)
+            fmt.Print(moveDown)
+            fmt.Print(moveDown)
+
+            fmt.Print("\r")
+
         case flag := <- NotificationFlag:
 
             //Move one line up
