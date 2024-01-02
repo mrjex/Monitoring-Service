@@ -19,3 +19,9 @@ func Connect() {
 	}
 	fmt.Println("App is connected to MongoDB")
 }
+
+// reusable get collection method taking string as parameter, the collection needs to have a representation in the database
+func GetCollection(collection string) *mongo.Collection {
+	col := Database.Collection(collection)
+	return col
+}

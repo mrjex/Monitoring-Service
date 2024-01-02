@@ -11,7 +11,7 @@ func InitializeLogger(client mqtt.Client) {
 
 }
 
-func GetAppointmentCollection() *mongo.Collection {
+func GetCollection() *mongo.Collection {
 	col := database.Database.Collection("Logs")
 	return col
 }
