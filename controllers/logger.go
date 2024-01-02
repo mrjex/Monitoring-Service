@@ -22,6 +22,9 @@ func InitialiseLogger(client mqtt.Client) {
 }
 
 func Log(message mqtt.Message) bool{
+    if message.Retained(){
+        return false
+    }
     var requestLog schemas.Log
     topic := message.Topic()
 
