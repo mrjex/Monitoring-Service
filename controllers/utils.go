@@ -16,6 +16,8 @@ func Menu(){
         fmt.Println("--------------------------")
         fmt.Println("1. Service Availability")
         fmt.Println("--------------------------")
+        fmt.Println("q. Shut down")
+        fmt.Println("--------------------------")
 
         fmt.Println("Enter choice:")
         //Registers choice and executes coresponding code
@@ -25,8 +27,11 @@ func Menu(){
         case "1":
             go exitListener()
             DisplayAvailability()
+        case "q":
+            os.Exit(0)
         default:
-            return
+            fmt.Println("")
+            fmt.Println("Please enter valid option")
         }
     }
 
