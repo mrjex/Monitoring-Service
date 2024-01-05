@@ -25,6 +25,15 @@ func GetInstance() mqtt.Client {
 
 }
 
+func Close() {
+    if mqtt_client != nil{
+        mqtt_client.Disconnect(250) 
+        fmt.Println("")
+        fmt.Println("MQTT connection closed")
+    }
+
+}
+
 func getOptions() *mqtt.ClientOptions {
 	broker := os.Getenv("BROKER_URL")
 	url, err := url.Parse(broker)
