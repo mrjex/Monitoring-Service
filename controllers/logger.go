@@ -4,7 +4,6 @@ import (
 	"Monitoring-service/database"
 	"Monitoring-service/schemas"
 	"context"
-	"fmt"
 	"time"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
