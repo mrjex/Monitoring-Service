@@ -75,4 +75,4 @@ deploy:
   script:
     - az login --service-principal -u "$AZURE_CLIENT_ID" -p "$AZURE_CLIENT_SECRET" --tenant "$AZURE_TENANT_ID"
     - az container delete --name monitoring-service --resource-group Dentanoid --yes
-    - az container create --resource-group Dentanoid --name monitoring-service --image dentanoidRegistry.azurecr.io/services/appointment:latest --registry-username "$CI_REGISTRY_USER" --registry-password  "$CI_REGISTRY_PASSWORD" --restart-policy Always
+    - az container create --resource-group Dentanoid --name monitoring-service --image dentanoidRegistry.azurecr.io/services/monitoring:latest --registry-username "$CI_REGISTRY_USER" --registry-password  "$CI_REGISTRY_PASSWORD" --restart-policy Always
