@@ -22,6 +22,13 @@ var (
 	userResponse = make(chan struct{}, 1)
 	userDown     bool
 
+	NotificationFlag     = make(chan bool, 1)
+	notificationResponse = make(chan struct{}, 1)
+	notificationDown     bool
+
+	ClinicFlag         = make(chan bool, 1)
+	clinicResponse     = make(chan struct{}, 1)
+	clinicDown         bool
 	AvailableTimesChan = make(chan schemas.ResponseData, 1)
 )
 
@@ -29,6 +36,8 @@ func InitialiseAvailability(client mqtt.Client) {
 	checkServiceStatus()
 	go CheckUserService(client)
 	go CheckAppointmentService(client)
+	go CheckNotificationService(client)
+	go CheckClinicService(client)
 
 	tokenUserService := client.Subscribe("grp20/res/patients/get", byte(0), func(c mqtt.Client, m mqtt.Message) {
 		userResponse <- struct{}{}
@@ -50,6 +59,20 @@ func InitialiseAvailability(client mqtt.Client) {
 	})
 	if tokenAppointmentService.Error() != nil {
 		panic(tokenAppointmentService.Error())
+	}
+
+	tokenNotificationService := client.Subscribe("grp20/res/subscriber/get", byte(0), func(c mqtt.Client, m mqtt.Message) {
+		notificationResponse <- struct{}{}
+	})
+	if tokenNotificationService.Error() != nil {
+		panic(tokenNotificationService.Error())
+	}
+
+	tokenClinicService := client.Subscribe("grp20/res/map/nearby", byte(0), func(c mqtt.Client, m mqtt.Message) {
+		clinicResponse <- struct{}{}
+	})
+	if tokenClinicService.Error() != nil {
+		panic(tokenClinicService.Error())
 	}
 
 }
@@ -112,6 +135,66 @@ func CheckAppointmentService(client mqtt.Client) {
 	}
 }
 
+// Notification service
+func CheckNotificationService(client mqtt.Client) {
+	for {
+		requestID := primitive.NewObjectID().Hex()
+		patientID := primitive.NewObjectID().Hex()
+		message := `{"requestID": "` + requestID + `", "patient_ID": "` + patientID + `"}`
+		token := client.Publish("grp20/req/subscriber/get", 0, false, message)
+		token.Wait()
+
+		timeout := time.After(5 * time.Second)
+		select {
+		case <-notificationResponse:
+			NotificationFlag <- true
+			closeDownTime(primitive.NewDateTimeFromTime(time.Now()), "Notification")
+			notificationDown = false
+			time.Sleep(5 * time.Second)
+		case <-timeout:
+			NotificationFlag <- false
+			if !notificationDown {
+				downTime := schemas.DownTime{
+					TimeDown: primitive.NewDateTimeFromTime(time.Now()),
+					Service:  "Notification",
+				}
+				insertDownTimeDB(downTime)
+				notificationDown = true
+			}
+		}
+	}
+}
+
+// Clinic service
+func CheckClinicService(client mqtt.Client) {
+	for {
+		requestID := primitive.NewObjectID().Hex()
+		message := `{"requestID": "` + requestID + `", "nearby_clinics_number": "4", "reference_position": "50.13,12.10"}`
+		token := client.Publish("grp20/req/map/query/nearby/fixed/get", 0, false, message)
+		token.Wait()
+
+		timeout := time.After(5 * time.Second)
+		select {
+		case <-clinicResponse:
+			ClinicFlag <- true
+			closeDownTime(primitive.NewDateTimeFromTime(time.Now()), "Clinic")
+			clinicDown = false
+			time.Sleep(5 * time.Second)
+		case <-timeout:
+			ClinicFlag <- false
+			if !clinicDown {
+				downTime := schemas.DownTime{
+					TimeDown: primitive.NewDateTimeFromTime(time.Now()),
+					Service:  "Clinic",
+				}
+				insertDownTimeDB(downTime)
+				clinicDown = true
+			}
+
+		}
+	}
+}
+
 func insertDownTimeDB(downTime schemas.DownTime) {
 	col := database.Database.Collection("DownTime")
 
@@ -139,10 +222,8 @@ func checkServiceStatus() {
 
 	if len(userDownTimes) == 1 {
 		userDown = true
-		fmt.Println("Service down")
 	} else if len(userDownTimes) == 0 {
 		userDown = false
-		fmt.Println("Service not down")
 	}
 
 	// Appointment service
@@ -160,11 +241,48 @@ func checkServiceStatus() {
 
 	if len(appointDownTimes) == 1 {
 		appointmentDown = true
-		fmt.Println("Service down")
 	} else if len(appointDownTimes) == 0 {
 		appointmentDown = false
-		fmt.Println("Service not down")
 	}
+
+	//Notification servicee
+	var notifDownTimes []bson.M
+	filter = bson.M{"time_up": zeroTimePrim, "service": "Notification"}
+	res, err = col.Find(context.TODO(), filter)
+	if err != nil {
+		fmt.Println("Error getting from database")
+		return
+	}
+	if err = res.All(context.Background(), &notifDownTimes); err != nil {
+		fmt.Println("Error decoding")
+		return
+	}
+
+	if len(notifDownTimes) == 1 {
+		notificationDown = true
+	} else if len(notifDownTimes) == 0 {
+		notificationDown = false
+	}
+
+	// Clinic service
+	var clinicDownTimes []bson.M
+	filter = bson.M{"time_up": zeroTimePrim, "service": "Clinic"}
+	res, err = col.Find(context.TODO(), filter)
+	if err != nil {
+		fmt.Println("Error getting from database")
+		return
+	}
+	if err = res.All(context.Background(), &clinicDownTimes); err != nil {
+		fmt.Println("Error decoding")
+		return
+	}
+
+	if len(clinicDownTimes) == 1 {
+		clinicDown = true
+	} else if len(clinicDownTimes) == 0 {
+		clinicDown = false
+	}
+
 }
 
 func closeDownTime(upTime primitive.DateTime, service string) {

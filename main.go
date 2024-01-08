@@ -28,7 +28,10 @@ func main() {
 	// Connect to MQTT
 	mqtt.GetInstance()
 
-    controllers.Menu()
+	defer database.Close()
+	defer mqtt.Close()
+
+	controllers.Menu()
 
 	<-c
 	// Variant #1 MQTT
