@@ -110,7 +110,8 @@ func DisplayReqResMenu() {
 	fmt.Println("1. Appointment Service")
 	fmt.Println("2. User Service")
 	fmt.Println("3. Clinic Service")
-	fmt.Println("4. Back to main menu")
+	fmt.Println("4. All Services")
+	fmt.Println("5. Back to main menu")
 
 	scanner.Scan()
 	serviceChoice := scanner.Text()
@@ -123,6 +124,8 @@ func DisplayReqResMenu() {
 	case "3":
 		DisplayReqRes("ClinicService")
 	case "4":
+		DisplayReqRes("AllServices")
+	case "5":
 		return
 	default:
 		fmt.Println("Invalid choice. Please enter a valid option.")
@@ -140,7 +143,7 @@ func DisplayReqRes(service string) {
 		return
 	}
 
-	fmt.Println(fmt.Sprintf(colorGreen+"Request to response ratio for %s: %.2f%%"+resetTextStyle, service, percentage))
+	fmt.Println(fmt.Sprintf(colorGreen+"Response to request ratio for %s: %.2f%% (res/req)"+resetTextStyle, service, percentage))
 
 	<-exitChan
 }
