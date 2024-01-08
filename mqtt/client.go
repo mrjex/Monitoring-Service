@@ -8,6 +8,7 @@ import (
 	"os"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
+	"github.com/google/uuid"
 )
 
 var mqtt_client mqtt.Client
@@ -25,6 +26,15 @@ func GetInstance() mqtt.Client {
 
 }
 
+func Close() {
+    if mqtt_client != nil{
+        mqtt_client.Disconnect(250) 
+        fmt.Println("")
+        fmt.Println("MQTT connection closed")
+    }
+
+}
+
 func getOptions() *mqtt.ClientOptions {
 	broker := os.Getenv("BROKER_URL")
 	url, err := url.Parse(broker)
@@ -33,9 +43,9 @@ func getOptions() *mqtt.ClientOptions {
 	}
 	var opts = mqtt.NewClientOptions()
 	opts.AddBroker(fmt.Sprintf("tcp://%s", url))
-	opts.SetClientID("go_mqh2nbjk,n,u1h2ieh12iuett_client")
-	opts.SetUsername("")
-	opts.SetPassword("")
+	opts.SetClientID(uuid.NewString())
+	opts.SetUsername("dentanoid")
+	opts.SetPassword("dentanoid123")
 	opts.SetDefaultPublishHandler(messagePubHandler)
 	opts.OnConnect = connectHandler
 	opts.OnConnectionLost = connectLostHandler
@@ -49,6 +59,7 @@ var messagePubHandler mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Me
 var connectHandler mqtt.OnConnectHandler = func(client mqtt.Client) {
     fmt.Println("MQTT client is connected")
 	controllers.InitialiseLogger(client)
+	controllers.InitialiseAvailability(client)
 }
 
 var connectLostHandler mqtt.ConnectionLostHandler = func(client mqtt.Client, err error) {

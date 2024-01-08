@@ -1,6 +1,7 @@
 package main
 
 import (
+	"Monitoring-service/controllers"
 	"Monitoring-service/database"
 	"Monitoring-service/mqtt"
 	"log"
@@ -26,6 +27,11 @@ func main() {
 
 	// Connect to MQTT
 	mqtt.GetInstance()
+
+    defer database.Close()
+    defer mqtt.Close()
+	
+    controllers.Menu()
 
 	<-c
 	// Variant #1 MQTT
