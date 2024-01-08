@@ -20,11 +20,16 @@ func Connect() {
 	fmt.Println("App is connected to MongoDB")
 }
 
-func Close() {
-    if Database != nil{ 
-        Database.Client().Disconnect(context.TODO()) 
-        Database = nil
-        fmt.Println("Database connection closed") 
-    }
+// reusable get collection method taking string as parameter, the collection needs to have a representation in the database
+func GetCollection(collection string) *mongo.Collection {
+	col := Database.Collection(collection)
+	return col
 }
 
+func Close() {
+	if Database != nil {
+		Database.Client().Disconnect(context.TODO())
+		Database = nil
+		fmt.Println("Database connection closed")
+	}
+}

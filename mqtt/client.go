@@ -27,11 +27,11 @@ func GetInstance() mqtt.Client {
 }
 
 func Close() {
-    if mqtt_client != nil{
-        mqtt_client.Disconnect(250) 
-        fmt.Println("")
-        fmt.Println("MQTT connection closed")
-    }
+	if mqtt_client != nil {
+		mqtt_client.Disconnect(250)
+		fmt.Println("")
+		fmt.Println("MQTT connection closed")
+	}
 
 }
 
@@ -57,7 +57,7 @@ var messagePubHandler mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Me
 }
 
 var connectHandler mqtt.OnConnectHandler = func(client mqtt.Client) {
-    fmt.Println("MQTT client is connected")
+	fmt.Println("MQTT client is connected")
 	controllers.InitialiseLogger(client)
 	controllers.InitialiseAvailability(client)
 }
