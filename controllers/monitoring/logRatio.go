@@ -40,22 +40,27 @@ func GetNumOfResponses() (int32, error) {
 	return numOfResponses, nil
 }
 
-// Calculates the percentage of responses relative to requests
-func CalculatePercentage() (float64, error) {
-	numOfRequests, err := GetNumOfRequests()
+// Calculates the percentage of responses relative to requests for a specific service
+func CalculatePercentage(service string) (float64, error) {
+	requests := database.GetCollection("RequestLogs")
+	responses := database.GetCollection("ResponseLogs")
+
+	// Count requests with the specified service
+	countRequests, err := requests.CountDocuments(context.TODO(), bson.D{{"service", service}})
 	if err != nil {
 		return 0, err
 	}
 
-	numOfResponses, err := GetNumOfResponses()
+	// Count all responses
+	countResponses, err := responses.CountDocuments(context.TODO(), bson.D{})
 	if err != nil {
 		return 0, err
 	}
 
-	if numOfRequests == 0 {
-		return 0, errors.New("cannot calculate percentage with zero requests")
+	if countRequests == 0 {
+		return 0, errors.New("cannot calculate percentage with zero requests for the specified service")
 	}
 
-	percentage := (float64(numOfResponses) / float64(numOfRequests)) * 100
+	percentage := (float64(countResponses) / float64(countRequests)) * 100
 	return percentage, nil
 }

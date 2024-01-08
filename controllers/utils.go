@@ -1,10 +1,10 @@
 package controllers
 
 import (
+	"Monitoring-service/controllers/monitoring" // Import the monitoring package
 	"bufio"
 	"fmt"
 	"os"
-	"Monitoring-service/controllers/monitoring" // Import the monitoring package
 )
 
 var exitChan = make(chan struct{})
@@ -32,7 +32,7 @@ func Menu() {
 			DisplayAvailability()
 		case "2":
 			go exitListener()
-			DisplayReqRes()
+			DisplayReqResMenu()
 		default:
 			return
 		}
@@ -104,23 +104,45 @@ func DisplayAvailability() {
 	}
 }
 
-func DisplayReqRes() {
-	
+func DisplayReqResMenu() {
+	scanner := bufio.NewScanner(os.Stdin)
+	fmt.Println("Select a service for Req/Res ratio:")
+	fmt.Println("1. Appointment Service")
+	fmt.Println("2. User Service")
+	fmt.Println("3. Clinic Service")
+	fmt.Println("4. Back to main menu")
+
+	scanner.Scan()
+	serviceChoice := scanner.Text()
+
+	switch serviceChoice {
+	case "1":
+		DisplayReqRes("AppointmentService")
+	case "2":
+		DisplayReqRes("UserService")
+	case "3":
+		DisplayReqRes("ClinicService")
+	case "4":
+		return
+	default:
+		fmt.Println("Invalid choice. Please enter a valid option.")
+		DisplayReqResMenu()
+	}
+}
+
+func DisplayReqRes(service string) {
 	colorGreen := "\x1b[32m"
 	resetTextStyle := "\x1b[0m"
 
-
-	percentage, err := monitoring.CalculatePercentage()
+	percentage, err := monitoring.CalculatePercentage(service)
 	if err != nil {
 		fmt.Println("Error calculating percentage:", err)
 		return
 	}
 
-	fmt.Println("")
-	fmt.Println("Press ENTER to exit")
-	fmt.Println("--------------------")
-	
-	fmt.Println(fmt.Sprintf( colorGreen + "Request to response ratio: %.2f%%" + resetTextStyle, percentage))
+	fmt.Println(fmt.Sprintf(colorGreen+"Request to response ratio for %s: %.2f%%"+resetTextStyle, service, percentage))
+
+	<-exitChan
 }
 
 func exitListener() {
