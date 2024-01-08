@@ -37,13 +37,11 @@ func Log(message mqtt.Message) bool{
 
     reqRes := GetReqRes(topic)
     if reqRes == "req"{
-        fmt.Println("Req")
         col := GetRequestCollection()
         result, err := col.InsertOne(context.TODO(), requestLog)
         _ = result
         return err == nil
     } else if reqRes == "res" {
-        fmt.Println("Res")
         col := GetResponseCollection()
         result, err := col.InsertOne(context.TODO(), requestLog)
         _ = result
