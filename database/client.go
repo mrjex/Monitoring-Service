@@ -25,3 +25,11 @@ func GetCollection(collection string) *mongo.Collection {
 	col := Database.Collection(collection)
 	return col
 }
+
+func Close() {
+	if Database != nil {
+		Database.Client().Disconnect(context.TODO())
+		Database = nil
+		fmt.Println("Database connection closed")
+	}
+}

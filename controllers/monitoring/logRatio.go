@@ -4,7 +4,6 @@ import (
 	"Monitoring-service/database"
 	"context"
 	"errors"
-
 	"go.mongodb.org/mongo-driver/bson"
 )
 
@@ -27,7 +26,7 @@ func CalculatePercentage(service string) (float64, error) {
 	}
 
 	// Count all responses based on the filter
-	countResponses, err := responses.CountDocuments(context.TODO(), bson.D{})
+	countResponses, err := responses.CountDocuments(context.TODO(), filter)
 	if err != nil {
 		return 0, err
 	}
