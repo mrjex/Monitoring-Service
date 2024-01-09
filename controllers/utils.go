@@ -22,12 +22,17 @@ func Menu() {
 		fmt.Println("--------------------------")
 		fmt.Println("2. Req/res ratio")
 		fmt.Println("--------------------------")
+		fmt.Println("")
+		fmt.Println("--------------------------")
+		fmt.Println("3. Available times amount")
+		fmt.Println("--------------------------")
+		fmt.Println("")
+		fmt.Println("--------------------------")
 		fmt.Println("q. Shut down")
 		fmt.Println("--------------------------")
 
 		fmt.Println("Enter choice:")
 		//Registers choice and executes coresponding code
-		fmt.Println("Enter choice:")
 		if !scanner.Scan() {
 			fmt.Println("Error reading input.")
 			os.Exit(1)
@@ -41,6 +46,9 @@ func Menu() {
 		case "2":
 			go exitListener()
 			DisplayAllReqRes()
+		case "3":
+			go exitListener()
+			DisplayAvailableTimes()
 		case "q":
 			os.Exit(0)
 		default:
@@ -163,6 +171,28 @@ func DisplayAvailability() {
 			return
 		}
 
+	}
+}
+
+// DisplayAvailableTimes displays the number of available times by overwriting the existing line
+func DisplayAvailableTimes() {
+	colorGreen := "\x1b[32m"
+	resetTextStyle := "\x1b[0m"
+	fmt.Print("\033[A") // Move up one line
+	fmt.Print("\033[K") // Clear the line
+
+	fmt.Println("Press ENTER to exit")
+	fmt.Println("--------------------")
+
+	for {
+		select {
+		case payload := <-AvailableTimesChan:
+			numAvailableTimes := countAvailableTimes(payload)
+			fmt.Printf(colorGreen+"\rNumber of available times: %d"+resetTextStyle, numAvailableTimes)
+
+		case <-exitChan:
+			return
+		}
 	}
 }
 

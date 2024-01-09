@@ -4,6 +4,7 @@ import (
 	"Monitoring-service/database"
 	"Monitoring-service/schemas"
 	"context"
+	"encoding/json"
 	"fmt"
 	"time"
 
@@ -25,9 +26,10 @@ var (
 	notificationResponse = make(chan struct{}, 1)
 	notificationDown     bool
 
-	ClinicFlag     = make(chan bool, 1)
-	clinicResponse = make(chan struct{}, 1)
-	clinicDown     bool
+	ClinicFlag         = make(chan bool, 1)
+	clinicResponse     = make(chan struct{}, 1)
+	clinicDown         bool
+	AvailableTimesChan = make(chan schemas.ResponseData, 1)
 )
 
 func InitialiseAvailability(client mqtt.Client) {
@@ -44,7 +46,15 @@ func InitialiseAvailability(client mqtt.Client) {
 		panic(tokenUserService.Error())
 	}
 
-	tokenAppointmentService := client.Subscribe("grp20/res/timeslots/get", byte(0), func(c mqtt.Client, m mqtt.Message) {
+	tokenAppointmentService := client.Subscribe("grp20/res/availabletimes/get", byte(0), func(c mqtt.Client, m mqtt.Message) {
+		var payload schemas.ResponseData
+
+		err1 := json.Unmarshal(m.Payload(), &payload)
+		if err1 != nil {
+			go countAvailableTimes(payload)
+			return
+		}
+		AvailableTimesChan <- payload
 		appointmentResponse <- struct{}{}
 	})
 	if tokenAppointmentService.Error() != nil {
@@ -95,11 +105,12 @@ func CheckUserService(client mqtt.Client) {
 		}
 	}
 }
+
 func CheckAppointmentService(client mqtt.Client) {
 	for {
 		requestID := primitive.NewObjectID().Hex()
 		message := `{"requestID": "` + requestID + `"}`
-		token := client.Publish("grp20/req/timeslots/get", 0, false, message)
+		token := client.Publish("grp20/req/availabletimes/get", 0, false, message)
 		token.Wait()
 
 		timeout := time.After(5 * time.Second)
@@ -287,4 +298,12 @@ func closeDownTime(upTime primitive.DateTime, service string) {
 	if err != nil {
 		fmt.Println("Error updating db")
 	}
+}
+
+func countAvailableTimes(payload schemas.ResponseData) int {
+	if payload.AvailableTimes != nil {
+		availableTimes := *payload.AvailableTimes
+		return len(availableTimes)
+	}
+	return 0
 }
