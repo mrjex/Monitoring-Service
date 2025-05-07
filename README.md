@@ -1,5 +1,9 @@
 # Monitoring Service
-Welcome to the monitoring service! This service handles logging, statistics and monitoring.
+
+> ⚠️ **Disclaimer**: This is a **fork** of [Monitoring Service](https://github.com/Dentanoid/Monitoring-Service), originally created and maintained by the [Dentanoid Organization](https://github.com/Dentanoid)
+
+Welcome to the Monitoring Service! This service handles logging, statistics and monitoring.
+
 ## Getting started
 
 This service is written in Go. [Check this link for more information about GO.](https://go.dev/)
@@ -40,18 +44,12 @@ go build
 go run main.go
 ```
 Congratulations! You are now running the Monitoring service.
- 
 
 ## Roadmap
 This service will not get updated in the future, due to project being considered as closed when GU course DIT356 is finished.
 
 
 ## Authors and acknowledgment
-This service is a part of DIT356 distributed systems course, and is created by Group 20. [Check here for more information about the entire project.](https://git.chalmers.se/courses/dit355/2023/student-teams/dit356-2023-20/group-20-distributed-systems/-/wikis/home)
-
-***WIP DUE TO SERVICE STILL BEING DEVELOPED***
-
-In this service the following people have contributed:
 
 - Lucas Holter
 - Cornelia Olofsson Larsson 
@@ -59,8 +57,6 @@ In this service the following people have contributed:
 - Jonatan Boman 
 - Mohamad Khalil
 - Joel Mattson 
-
-
 
 ## Project status
 The service may recieve updates until 9th January 2024, and none after.
